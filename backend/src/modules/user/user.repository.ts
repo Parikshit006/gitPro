@@ -1,5 +1,6 @@
-import { User } from '@prisma/client';
+import { User as PrismaUser } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
+import { User } from './user.types';
 import { AppError } from '../../errors/AppError';
 import { HTTP_STATUS } from '../../constants/httpStatus';
 import { GitHubUserProfile } from '../auth/github.provider';
@@ -50,7 +51,7 @@ export class UserRepository {
     try {
       const now = new Date();
 
-      return await prisma.user.upsert({
+      const persistedUser = await prisma.user.upsert({
         where: { githubId: profile.githubId },
         update: {
           username: profile.username,
@@ -70,6 +71,21 @@ export class UserRepository {
           lastLoginAt: now,
         },
       });
+
+      return {
+        id: persistedUser.id,
+        githubId: persistedUser.githubId.toString(),
+        username: persistedUser.username,
+        displayName: persistedUser.displayName,
+        email: persistedUser.email,
+        avatarUrl: persistedUser.avatarUrl,
+        profileUrl: persistedUser.profileUrl,
+        isActive: persistedUser.isActive,
+        provider: persistedUser.provider,
+        createdAt: persistedUser.createdAt,
+        updatedAt: persistedUser.updatedAt,
+        lastLoginAt: persistedUser.lastLoginAt,
+      };
     } catch (_error) {
       throw new AppError(
         'Failed to persist user record',

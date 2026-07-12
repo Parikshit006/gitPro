@@ -6,10 +6,15 @@
 
 export interface User {
   id: string;
-  githubId: string;
+  githubId: string; // BigInt mapped to string in domain model for safety
   username: string;
-  email: string;
-  avatarUrl?: string;
+  displayName: string;
+  email: string | null;
+  avatarUrl: string;
+  profileUrl: string;
+  isActive: boolean;
+  provider: string;
   createdAt: Date;
   updatedAt: Date;
+  lastLoginAt: Date | null;
 }
