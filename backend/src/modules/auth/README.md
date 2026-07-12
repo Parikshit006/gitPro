@@ -10,6 +10,7 @@ The Auth module owns the authentication and authorization boundary for GitPro. I
 - **OAuth initiation endpoint** — Exposing `GET /api/v1/auth/github` to redirect the browser to GitHub's consent screen.
 - **State management** — Generating, validating, expiring, and deleting CSRF state tokens for the OAuth flow.
 - **Authorization code exchange** — Exchanging OAuth authorization codes for GitHub access tokens via server-to-server HTTP.
+- **GitHub user profile retrieval** — Fetching the authenticated user's identity from GitHub and mapping it into GitPro's internal domain model.
 
 ## Current Files
 
@@ -19,14 +20,13 @@ The Auth module owns the authentication and authorization boundary for GitPro. I
 | `auth.controller.ts`  | HTTP transport layer — orchestrates redirect via AuthService.         |
 | `auth.routes.ts`      | Route registration — maps `GET /github` to the controller.            |
 | `state.service.ts`    | OAuth state lifecycle — create, validate, expire, delete.             |
-| `github.provider.ts`  | Exchanges authorization codes for access tokens via GitHub API.       |
+| `github.provider.ts`  | Token exchange and authenticated user profile retrieval via GitHub API.|
 
 ## Future Roadmap
 
 | Feature                          | Files introduced                                              |
 |----------------------------------|---------------------------------------------------------------|
 | OAuth Callback Handling          | Extension of `auth.controller.ts`, `auth.routes.ts`           |
-| GitHub Profile Retrieval         | Extension of `github.provider.ts`                             |
 | Session / JWT Management         | Extension of `auth.service.ts`                                |
 | Request Validation               | `auth.dto.ts`                                                 |
 | Redis State Storage              | Swap internal Map in `state.service.ts` (no caller changes)   |
