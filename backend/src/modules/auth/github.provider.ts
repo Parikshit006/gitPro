@@ -83,6 +83,7 @@ interface GitHubRawUser {
   id: number;
   login: string;
   name: string | null;
+  email: string | null;
   avatar_url: string;
   html_url: string;
 }
@@ -92,6 +93,7 @@ export interface GitHubUserProfile {
   githubId: number;
   username: string;
   displayName: string;
+  email?: string | null;
   avatarUrl: string;
   profileUrl: string;
 }
@@ -232,6 +234,7 @@ export class GitHubProvider {
       githubId: raw.id,
       username: raw.login,
       displayName: raw.name || raw.login,
+      email: raw.email || null,
       avatarUrl: raw.avatar_url,
       profileUrl: raw.html_url,
     };
