@@ -19,5 +19,6 @@ import { authController } from './auth.controller';
 const router = Router();
 
 router.get('/github', authController.initiateGitHubOAuth);
+router.get('/github/callback', authController.githubCallback);
 
 export default router;
