@@ -27,10 +27,12 @@ import { PrismaClient } from '@prisma/client';
  *   infrastructure instance, repositories remain lightweight, memory usage
  *   is minimized, and connection pooling is centralized and optimized.
  */
+import config from '../config';
+
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (config.app.nodeEnv !== 'production') globalForPrisma.prisma = prisma;

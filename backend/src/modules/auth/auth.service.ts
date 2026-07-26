@@ -3,7 +3,7 @@ import { GitHubProvider } from './github.provider';
 import { UserRepository } from '../user/user.repository';
 import { AppError } from '../../errors/AppError';
 import { HTTP_STATUS } from '../../constants/httpStatus';
-import { User } from '@prisma/client';
+import { User } from '../user/user.types';
 
 /**
  * Auth Service (Application Service)

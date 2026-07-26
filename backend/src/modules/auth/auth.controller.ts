@@ -43,7 +43,8 @@ import { AuthService } from './auth.service';
 import { JwtService } from './jwt.service';
 import { AppError } from '../../errors/AppError';
 import { HTTP_STATUS } from '../../constants/httpStatus';
-import { authConfig } from '../../config/auth.config';
+import config from '../../config';
+
 
 // Note: Future refactoring will transition to dependency injection for controllers
 const authService = new AuthService();
@@ -72,7 +73,7 @@ export class AuthController {
 
       // Handle GitHub OAuth error callback (e.g., user denied access)
       if (error) {
-        res.redirect(`${authConfig.failureRedirectUrl}?reason=${error}`);
+        res.redirect(`${config.auth.failureRedirectUrl}?reason=${error}`);
         return;
       }
 
@@ -99,16 +100,16 @@ export class AuthController {
       const token = jwtService.generateToken(user);
 
       // 3. Controller sets the cookie (HTTP concern)
-      res.cookie(authConfig.cookieName, token, {
+      res.cookie(config.auth.cookieName, token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: config.app.nodeEnv === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: authConfig.cookieMaxAgeMs,
+        maxAge: config.auth.cookieMaxAge,
       });
 
       // 4. Controller redirects the browser (HTTP concern)
-      res.redirect(authConfig.successRedirectUrl);
+      res.redirect(config.auth.successRedirectUrl);
     } catch (error) {
       next(error);
     }

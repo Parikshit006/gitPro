@@ -1,4 +1,4 @@
-import { githubOAuthConfig } from '../../config/githubOAuth.config';
+import config from '../../config';
 import { AppError } from '../../errors/AppError';
 import { HTTP_STATUS } from '../../constants/httpStatus';
 
@@ -109,8 +109,8 @@ export class GitHubProvider {
    */
   buildAuthorizationUrl(state: string): string {
     const url = new URL(GITHUB_AUTHORIZE_ENDPOINT);
-    url.searchParams.set('client_id', githubOAuthConfig.clientId);
-    url.searchParams.set('redirect_uri', githubOAuthConfig.callbackUrl);
+    url.searchParams.set('client_id', config.github.clientId);
+    url.searchParams.set('redirect_uri', config.github.callbackUrl);
     url.searchParams.set('scope', SCOPES.join(' '));
     url.searchParams.set('state', state);
 
@@ -130,10 +130,10 @@ export class GitHubProvider {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        client_id: githubOAuthConfig.clientId,
-        client_secret: githubOAuthConfig.clientSecret,
+        client_id: config.github.clientId,
+        client_secret: config.github.clientSecret,
         code,
-        redirect_uri: githubOAuthConfig.callbackUrl,
+        redirect_uri: config.github.callbackUrl,
       }),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });

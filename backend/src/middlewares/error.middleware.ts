@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../errors/AppError';
 import { HTTP_STATUS } from '../constants/httpStatus';
+import config from '../config';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
-  let statusCode = HTTP_STATUS.INTERNAL_SERVER_ERROR;
+  let statusCode: number = HTTP_STATUS.INTERNAL_SERVER_ERROR;
   let message = 'Internal Server Error';
 
   if (err instanceof AppError) {
@@ -19,8 +20,9 @@ export const errorHandler = (err: Error, req: Request, res: Response, next: Next
   const response = {
     success: false,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...(config.app.nodeEnv === 'development' && { stack: err.stack }),
   };
+
 
   res.status(statusCode).json(response);
 };

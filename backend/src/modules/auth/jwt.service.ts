@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 import { AppError } from '../../errors/AppError';
 import { HTTP_STATUS } from '../../constants/httpStatus';
 import { User } from '../user/user.types';
+import config from '../../config';
+
 
 /**
  * JWT Service
@@ -52,14 +54,11 @@ export interface JwtPayload {
 
 export class JwtService {
   private readonly secret: string;
-  private readonly expiresIn = '7d'; // TODO: Move to environment configuration
+  private readonly expiresIn: string;
 
   constructor() {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-      throw new Error('FATAL: JWT_SECRET environment variable is missing.');
-    }
-    this.secret = secret;
+    this.secret = config.auth.jwtSecret;
+    this.expiresIn = config.auth.jwtExpiresIn;
   }
 
   /**
@@ -75,7 +74,7 @@ export class JwtService {
     };
 
     return jwt.sign(payload, this.secret, {
-      expiresIn: this.expiresIn,
+      expiresIn: this.expiresIn as jwt.SignOptions['expiresIn'],
       algorithm: 'HS256',
     });
   }
