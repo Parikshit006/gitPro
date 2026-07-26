@@ -39,7 +39,214 @@ model User {
   updatedAt   DateTime  @updatedAt @map("updated_at")
   lastLoginAt DateTime? @map("last_login_at")
 
+  repositories Repository[]
+
   @@index([username])
   @@index([email])
   @@map("users")
+}
+
+// ============================================================
+// Repository Status Enum
+//
+// Tracks the lifecycle of a registered repository within GitPro.
+//   REGISTERED — URL accepted, metadata persisted, no sync yet.
+//   SYNCING    — Git history is being cloned and parsed.
+//   READY      — All data ingested and available for analysis.
+//   FAILED     — A sync attempt failed; eligible for retry.
+// ============================================================
+
+enum RepositoryStatus {
+  REGISTERED
+  SYNCING
+  READY
+  FAILED
+}
+
+// ============================================================
+// Repository Model
+//
+// Represents a GitHub repository registered for analysis within
+// GitPro. Contains metadata fetched from GitHub's REST API at
+// registration time. Does NOT store cloned data.
+//
+// GitHub Repository ID is the external identity key.
+// Internal UUID is the primary key used across all GitPro domains.
+// ============================================================
+
+model Repository {
+  id            String           @id @default(uuid()) @db.Uuid
+  githubId      BigInt           @unique @map("github_id") @db.BigInt
+  owner         String
+  name          String
+  fullName      String           @unique @map("full_name")
+  defaultBranch String           @map("default_branch")
+  visibility    String
+  cloneUrl      String           @map("clone_url") @db.Text
+  sizeKb        Int              @map("size_kb")
+  language      String?
+  description   String?          @db.Text
+  status        RepositoryStatus @default(REGISTERED)
+
+  registeredById String?  @map("registered_by_id") @db.Uuid
+  registeredBy   User?    @relation(fields: [registeredById], references: [id])
+
+  snapshots    RepositorySnapshot[]
+  commitEvents CommitEvent[]
+  fileNodes    FileNode[]
+  commitNodes  CommitNode[]
+  graphEdges   GraphEdge[]
+  metricResults MetricResult[]
+
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  @@unique([owner, name])
+  @@index([registeredById])
+  @@index([status])
+  @@map("repositories")
+}
+
+// ============================================================
+// Repository Snapshot Model
+//
+// Captures point-in-time synchronization state of a repository
+// upon completion of a clone or fetch cycle. Stores the HEAD commit
+// hash, active default branch, commit count, and sync timestamp.
+// ============================================================
+
+model RepositorySnapshot {
+  id                 String     @id @default(uuid()) @db.Uuid
+  repositoryId       String     @map("repository_id") @db.Uuid
+  repository         Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  headCommit         String     @map("head_commit")
+  defaultBranch      String     @map("default_branch")
+  lastFetchedAt      DateTime   @map("last_fetched_at")
+  lastAnalyzedCommit String?    @map("last_analyzed_commit")
+  commitCount        Int        @map("commit_count")
+  analysisVersion    Int        @default(1) @map("analysis_version")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
+
+  @@index([repositoryId])
+  @@map("repository_snapshots")
+}
+
+// ============================================================
+// Raw Event Store Model (CommitEvent)
+//
+// Single source of truth for immutable historical Git commits.
+// Once ingested, Git history is never reread for analytical engines.
+// ============================================================
+
+model CommitEvent {
+  id           String     @id @default(uuid()) @db.Uuid
+  repositoryId String     @map("repository_id") @db.Uuid
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  hash         String     @unique
+  parentHashes Json       @map("parent_hashes")
+  authorName   String     @map("author_name")
+  authorEmail  String     @map("author_email")
+  authoredAt   DateTime   @map("authored_at")
+  committedAt  DateTime   @map("committed_at")
+  message      String     @db.Text
+  version      Int        @default(1)
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([repositoryId])
+  @@index([committedAt])
+  @@map("commit_events")
+}
+
+// ============================================================
+// Engineering Knowledge Graph Schema (Sprint 4 Phase 1)
+//
+// Defines nodes and directed relationships for repository engineering topology.
+// Decoupled from analytical metrics and AI analysis.
+// ============================================================
+
+enum GraphEdgeType {
+  AUTHORED
+  MODIFIED
+  PARENT_OF
+  CONTAINS
+  HAS_COMMIT
+}
+
+model Developer {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email])
+  @@map("developers")
+}
+
+model FileNode {
+  id           String     @id @default(uuid()) @db.Uuid
+  repositoryId String     @map("repository_id") @db.Uuid
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  path         String     @db.Text
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@unique([repositoryId, path])
+  @@index([repositoryId])
+  @@map("file_nodes")
+}
+
+model CommitNode {
+  id           String     @id @default(uuid()) @db.Uuid
+  repositoryId String     @map("repository_id") @db.Uuid
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  hash         String     @unique
+  authoredAt   DateTime   @map("authored_at")
+  message      String     @db.Text
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@index([repositoryId])
+  @@index([hash])
+  @@map("commit_nodes")
+}
+
+model GraphEdge {
+  id           String        @id @default(uuid()) @db.Uuid
+  repositoryId String        @map("repository_id") @db.Uuid
+  repository   Repository    @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  sourceId     String        @map("source_id") @db.Uuid
+  targetId     String        @map("target_id") @db.Uuid
+  type         GraphEdgeType
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  @@unique([sourceId, targetId, type])
+  @@index([type])
+  @@index([repositoryId])
+  @@index([sourceId])
+  @@index([targetId])
+  @@map("graph_edges")
+}
+
+// ============================================================
+// Engineering Metrics Framework Schema (Sprint 4 Phase 2)
+//
+// Generic persistence store for plugin-calculated engineering metrics.
+// Decoupled from graph topology construction and AI dashboard APIs.
+// ============================================================
+
+model MetricResult {
+  id           String     @id @default(uuid()) @db.Uuid
+  repositoryId String     @map("repository_id") @db.Uuid
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  metricName   String     @map("metric_name")
+  entityType   String     @map("entity_type")
+  entityId     String     @map("entity_id")
+  score        Float
+  metadata     Json?
+  calculatedAt DateTime   @default(now()) @map("calculated_at")
+
+  @@index([repositoryId])
+  @@index([metricName])
+  @@index([entityId])
+  @@map("metric_results")
 }

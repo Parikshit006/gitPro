@@ -1,4 +1,3 @@
-import { User as PrismaUser } from '@prisma/client';
 import { prisma } from '../../lib/prisma';
 import { User } from './user.types';
 import { AppError } from '../../errors/AppError';
@@ -86,7 +85,7 @@ export class UserRepository {
         updatedAt: persistedUser.updatedAt,
         lastLoginAt: persistedUser.lastLoginAt,
       };
-    } catch (_error) {
+    } catch {
       throw new AppError(
         'Failed to persist user record',
         HTTP_STATUS.INTERNAL_SERVER_ERROR,

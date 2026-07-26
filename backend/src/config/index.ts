@@ -2,6 +2,7 @@ import { appConfig } from './app.config';
 import { authConfig } from './auth.config';
 import { databaseConfig } from './database.config';
 import { githubConfig } from './github.config';
+import { ingestionConfig } from './ingestion.config';
 
 /**
  * Centralized Configuration Layer
@@ -16,6 +17,7 @@ export const config = Object.freeze({
   auth: authConfig,
   database: databaseConfig,
   github: githubConfig,
+  ingestion: ingestionConfig,
 });
 
 export default config;

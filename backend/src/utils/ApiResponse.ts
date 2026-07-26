@@ -16,7 +16,7 @@ export class ApiResponse<T> {
     this.data = data;
   }
 
-  static success<T>(res: Response, message: string, data?: T, statusCode = HTTP_STATUS.OK) {
+  static success<T>(res: Response, message: string, data?: T, statusCode: number = HTTP_STATUS.OK) {
     return res.status(statusCode).json(new ApiResponse<T>(true, message, statusCode, data));
   }
 }
