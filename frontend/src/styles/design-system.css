@@ -1,0 +1,205 @@
+/* ============================================================
+   GitPro — Design System
+   
+   Premium Apple-inspired engineering intelligence platform.
+   All design tokens, typography, spacing, motion, and 
+   glass-morphism utilities defined in a single source of truth.
+   ============================================================ */
+
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+/* ── Color Tokens ── */
+:root {
+  /* Backgrounds */
+  --bg:           #0A0B0D;
+  --bg-elevated:  #12151A;
+  --bg-surface:   rgba(255, 255, 255, 0.03);
+  --bg-hover:     rgba(255, 255, 255, 0.04);
+  --bg-active:    rgba(255, 255, 255, 0.06);
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* Text */
+  --text:         #F3F5F7;
+  --text-muted:   #8B939C;
+  --text-dimmed:  #5A6370;
+
+  /* Status */
+  --healthy:      #2DD4BF;
+  --healthy-bg:   rgba(45, 212, 191, 0.1);
+  --risk:         #F5A524;
+  --risk-bg:      rgba(245, 165, 36, 0.1);
+  --critical:     #F2545B;
+  --critical-bg:  rgba(242, 84, 91, 0.1);
+
+  /* ── Typography ── */
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body:    'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono:    'IBM Plex Mono', 'SF Mono', 'Fira Code', monospace;
+
+  /* Font sizes — fluid scale */
+  --text-xs:   0.75rem;    /* 12px */
+  --text-sm:   0.8125rem;  /* 13px */
+  --text-base: 0.875rem;   /* 14px */
+  --text-md:   1rem;       /* 16px */
+  --text-lg:   1.125rem;   /* 18px */
+  --text-xl:   1.25rem;    /* 20px */
+  --text-2xl:  1.5rem;     /* 24px */
+  --text-3xl:  1.875rem;   /* 30px */
+  --text-4xl:  2.25rem;    /* 36px */
+
+  /* ── Spacing Scale ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Border Radius ── */
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-full: 9999px;
+
+  /* ── Motion ── */
+  --duration-fast:   120ms;
+  --duration-base:   200ms;
+  --duration-slow:   300ms;
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:     cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Layout ── */
+  --max-width: 1600px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 64px;
+  --header-height: 56px;
+}
+
+/* ── Glass Morphism Utilities ── */
+
+.glass-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: transform var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.glass-card--interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.glass-surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── Typography Helpers ── */
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: -0.01em;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-dimmed {
+  color: var(--text-dimmed);
+}
+
+/* ── Layout Utilities ── */
+
+.page-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6);
+}
+
+/* ── Status Colors ── */
+
+.status-healthy { color: var(--healthy); }
+.status-risk    { color: var(--risk); }
+.status-critical { color: var(--critical); }
+
+.status-bg-healthy  { background: var(--healthy-bg); }
+.status-bg-risk     { background: var(--risk-bg); }
+.status-bg-critical { background: var(--critical-bg); }
+
+/* ── Skeleton Animation ── */
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.06; }
+  50%      { opacity: 0.12; }
+}
+
+.skeleton {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  animation: skeleton-pulse 1.8s var(--ease-in-out) infinite;
+}
+
+/* ── Sync Pulse Animation ── */
+
+@keyframes sync-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+.pulse-sync {
+  animation: sync-pulse 1.5s var(--ease-in-out) infinite;
+}
+
+/* ── Screen Reader Only ── */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ── Backdrop Filter Fallback ── */
+
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-card {
+    background: #181B22;
+  }
+  .glass-surface {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}

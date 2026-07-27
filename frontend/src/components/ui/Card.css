@@ -1,0 +1,23 @@
+.card-header {
+  margin-bottom: var(--space-4);
+}
+
+.card-title {
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+
+.card-content {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.p-6 {
+  padding: var(--space-6);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}

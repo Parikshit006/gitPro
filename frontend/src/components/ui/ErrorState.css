@@ -1,0 +1,58 @@
+.error-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--critical-bg);
+  border: 1px solid rgba(242, 84, 91, 0.2);
+  border-radius: var(--radius-lg);
+}
+
+.error-state-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.error-state-icon-wrapper {
+  flex-shrink: 0;
+  color: var(--critical);
+}
+
+.error-state-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.error-state-title {
+  font-size: var(--text-md);
+  color: var(--critical);
+  margin-bottom: var(--space-1);
+}
+
+.error-state-message {
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.error-state-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-left: 40px; /* align with text */
+}
+
+.error-state-details {
+  margin-left: 40px;
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.error-state-details pre {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  margin: 0;
+}

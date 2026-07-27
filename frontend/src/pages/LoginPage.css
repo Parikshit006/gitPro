@@ -1,0 +1,69 @@
+/* ============================================================
+   GitPro — Login Page CSS
+   ============================================================ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg);
+  /* Optional: very subtle ambient glow behind the card */
+  background-image: radial-gradient(circle at center, rgba(45, 212, 191, 0.05) 0%, transparent 50%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+}
+
+.login-header {
+  text-align: center;
+}
+
+.login-header h1 {
+  font-size: var(--text-2xl);
+  color: var(--text);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.02em;
+}
+
+.login-header p {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--text);
+  color: var(--bg);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--text-md);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.login-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.login-button .icon {
+  width: 20px;
+  height: 20px;
+}
