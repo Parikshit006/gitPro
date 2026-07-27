@@ -213,6 +213,71 @@ export interface NotificationResult {
   readonly error?: string;
 }
 
+/* ── Search ── */
+
+export type SearchEntityType = 'REPOSITORY' | 'DEVELOPER' | 'HEALTH' | 'HOTSPOT' | 'OWNERSHIP' | 'INSIGHT' | 'ALL';
+export type SortDirection = 'asc' | 'desc';
+
+export interface PaginationMetadata {
+  readonly totalItems: number;
+  readonly totalPages: number;
+  readonly currentPage: number;
+  readonly pageSize: number;
+  readonly hasNextPage: boolean;
+  readonly hasPreviousPage: boolean;
+}
+
+export interface SearchResultItem {
+  readonly id: string;
+  readonly title: string;
+  readonly subtitle: string;
+  readonly type: SearchEntityType;
+  readonly url: string;
+  readonly score?: number;
+  readonly badge?: string;
+  readonly metadata?: Record<string, unknown>;
+}
+
+export interface UnifiedSearchResponse {
+  readonly results: readonly SearchResultItem[];
+  readonly pagination: PaginationMetadata;
+  readonly executionTimeMs: number;
+}
+
+/* ── AI ── */
+
+export interface AIResponse {
+  readonly content: string;
+  readonly provider: string;
+  readonly modelName: string;
+  readonly usage?: {
+    readonly promptTokens: number;
+    readonly completionTokens: number;
+    readonly totalTokens: number;
+  };
+  readonly promptVersion?: string;
+  readonly responseVersion?: string;
+}
+
+export interface AIProviderStatus {
+  readonly provider: string;
+  readonly modelName: string;
+  readonly timeoutMs: number;
+  readonly retries: number;
+  readonly promptVersion: string;
+  readonly responseVersion: string;
+  readonly fallbackProvider: string;
+}
+
+export interface AIChatMessage {
+  readonly id: string;
+  readonly sender: 'user' | 'ai';
+  readonly content: string;
+  readonly timestamp: string;
+  readonly riskLevel?: RiskLevel;
+  readonly recommendations?: readonly string[];
+}
+
 /* ── API Envelope ── */
 
 export interface ApiResponse<T> {
@@ -226,3 +291,4 @@ export interface ApiError {
   readonly message: string;
   readonly stack?: string;
 }
+
