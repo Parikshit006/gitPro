@@ -2,29 +2,14 @@
  * Repository Controller
  *
  * Purpose:
- *   The HTTP transport boundary for the Repository module. This controller
- *   translates incoming HTTP requests into calls to the RepositoryService
- *   and formats the result back into a standard ApiResponse.
+ *   The HTTP transport boundary for the Repository module.
  *
- * Why the controller contains no business logic:
- *   The controller's sole responsibility is to bridge HTTP and the service
- *   layer. It extracts data from the request, delegates to the service,
- *   and formats the response. URL validation, duplicate detection, and
- *   GitHub API calls are entirely the service's concern. This separation
- *   ensures the service can be invoked from background jobs, CLI tools,
- *   or other transports without modification.
- *
- * Why 201 Created is used for successful registration:
- *   HTTP 201 indicates that the request has been fulfilled and a new
- *   resource has been created. This is semantically correct for a POST
- *   endpoint that creates a new repository record. The response body
- *   contains the created resource.
- *
- * Why errors are forwarded to next():
- *   Express's centralized error middleware handles all error formatting
- *   and status code mapping. By forwarding errors via next(), the
- *   controller avoids duplicating error response logic and ensures
- *   consistent error formatting across all endpoints.
+ * Endpoints:
+ *   GET  /         — List all registered repositories
+ *   POST /         — Register a new repository by clone URL
+ *   GET  /:id      — Get a single repository by internal UUID
+ *   POST /:id/sync — Trigger clone / re-sync
+ *   GET  /:id/health — File system health check
  */
 
 import { Request, Response, NextFunction } from 'express';
@@ -35,33 +20,60 @@ import { ApiResponse } from '../../utils/ApiResponse';
 import { HTTP_STATUS } from '../../constants/httpStatus';
 import { AppError } from '../../errors/AppError';
 
-// Note: Future refactoring will transition to dependency injection for controllers
 const repositoryService = new RepositoryService();
 const repositorySyncService = new RepositorySyncService();
 
 export class RepositoryController {
   /**
-   * Handles POST /api/v1/repositories
-   *
-   * Accepts a JSON body with a GitHub repository URL, delegates
-   * registration to the service layer, and returns the created
-   * repository with a 201 status code.
+   * GET /api/v1/repositories
+   * Returns all registered repositories for this GitPro instance.
+   */
+  async list(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const repositories = await repositoryService.listRepositories();
+      ApiResponse.success(res, 'Repositories retrieved successfully', repositories, HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /api/v1/repositories
+   * Accepts a JSON body with a GitHub repository URL, registers it, and returns the record.
    */
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { url } = req.body as RegisterRepositoryRequest;
+      const { url, cloneUrl } = req.body as RegisterRepositoryRequest & { cloneUrl?: string };
+      const repositoryUrl = url || cloneUrl;
 
-      if (!url) {
+      if (!repositoryUrl) {
         throw new AppError(
-          'Request body must include a "url" field',
+          'Request body must include a "url" field with the GitHub repository URL',
           HTTP_STATUS.BAD_REQUEST,
           true,
         );
       }
 
-      const repository = await repositoryService.registerRepository(url);
-
+      const repository = await repositoryService.registerRepository(repositoryUrl);
       ApiResponse.success(res, 'Repository registered successfully', repository, HTTP_STATUS.CREATED);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * GET /api/v1/repositories/:id
+   * Returns a single repository by its internal UUID.
+   */
+  async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      if (!id) {
+        throw new AppError('Repository ID is required', HTTP_STATUS.BAD_REQUEST, true);
+      }
+
+      const repository = await repositoryService.getRepository(id);
+      ApiResponse.success(res, 'Repository retrieved successfully', repository, HTTP_STATUS.OK);
     } catch (error) {
       next(error);
     }

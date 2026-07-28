@@ -9,6 +9,7 @@ import { NotificationCenter } from '../components/NotificationCenter';
 import { CommandPalette } from '../components/CommandPalette';
 import { OnboardingModal } from '../components/OnboardingModal';
 import { useRepositories } from '../hooks/useRepositories';
+import { useLogout } from '../hooks/useAuth';
 import './AppLayout.css';
 
 export function AppLayout() {
@@ -19,6 +20,7 @@ export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { data: repos, isLoading: isReposLoading } = useRepositories();
+  const { mutate: logout } = useLogout();
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -35,7 +37,7 @@ export function AppLayout() {
   }, [location.pathname]);
 
   const handleLogout = () => {
-    window.location.href = '/login';
+    logout();
   };
 
   const showOnboarding = !isReposLoading && repos?.length === 0 && !isOnboardingDismissed && location.pathname === '/dashboard';

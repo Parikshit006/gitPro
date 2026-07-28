@@ -1,8 +1,19 @@
 /* ============================================================
    GitPro — Dashboard Query Hooks
-   
-   TanStack Query hooks for executive dashboard and
-   repository detail views.
+
+   TanStack Query hooks for the executive dashboard and
+   repository detail views. All endpoints must match the
+   backend dashboard.routes.ts exactly.
+
+   Backend routes (dashboard.routes.ts):
+     GET /api/v1/dashboard                        → getDashboardOverview
+     GET /api/v1/dashboard/repositories           → getRepositories
+     GET /api/v1/dashboard/repositories/:id       → getRepositoryOverview
+     GET /api/v1/dashboard/repositories/:id/health
+     GET /api/v1/dashboard/repositories/:id/activity
+     GET /api/v1/dashboard/repositories/:id/hotspots
+     GET /api/v1/dashboard/repositories/:id/ownership
+     GET /api/v1/dashboard/repositories/:id/bus-factor
    ============================================================ */
 
 import { useQuery } from '@tanstack/react-query';
@@ -20,6 +31,7 @@ import type {
 export const dashboardKeys = {
   all: ['dashboard'] as const,
   overview: () => [...dashboardKeys.all, 'overview'] as const,
+  repos: () => [...dashboardKeys.all, 'repositories'] as const,
   repoBase: (id: string) => [...dashboardKeys.all, 'repository', id] as const,
   repoOverview: (id: string) => [...dashboardKeys.repoBase(id), 'overview'] as const,
   repoHealth: (id: string) => [...dashboardKeys.repoBase(id), 'health'] as const,
@@ -29,12 +41,13 @@ export const dashboardKeys = {
   repoInsights: (id: string) => [...dashboardKeys.repoBase(id), 'insights'] as const,
 };
 
-/* ── Global Dashboard ── */
+/* ── Global Dashboard ──
+   Backend: GET /api/v1/dashboard (not /dashboard/overview) */
 
 export function useDashboardOverview() {
   return useQuery<DashboardOverview>({
     queryKey: dashboardKeys.overview(),
-    queryFn: () => api.get('/dashboard/overview') as Promise<DashboardOverview>,
+    queryFn: () => api.get('/dashboard') as Promise<DashboardOverview>,
   });
 }
 
@@ -72,6 +85,7 @@ export function useRepositoryHotspots(id: string) {
   });
 }
 
+/* useRepositoryDevelopers maps to the dedicated /developers endpoint. */
 export function useRepositoryDevelopers(id: string) {
   return useQuery<DeveloperNode[]>({
     queryKey: dashboardKeys.repoDevelopers(id),
@@ -80,6 +94,7 @@ export function useRepositoryDevelopers(id: string) {
   });
 }
 
+/* useRepositoryInsights maps to the dedicated /insights endpoint. */
 export function useRepositoryInsights(id: string) {
   return useQuery<RepositoryInsight>({
     queryKey: dashboardKeys.repoInsights(id),

@@ -92,4 +92,20 @@ router.get(
   controller.getRepositoryBusFactor,
 );
 
+// GET /api/v1/dashboard/repositories/:id/developers -> Developer Graph Nodes & Ownership Breakdown
+router.get(
+  '/repositories/:id/developers',
+  authenticate,
+  /* TODO: [Placeholder] Add Zod / Route parameter (:id) validation middleware here */
+  controller.getRepositoryDevelopers,
+);
+
+// GET /api/v1/dashboard/repositories/:id/insights -> AI Engineering Risk Insights & Recommendations
+router.get(
+  '/repositories/:id/insights',
+  authenticate,
+  /* TODO: [Placeholder] Add Zod / Route parameter (:id) validation middleware here */
+  controller.getRepositoryInsights,
+);
+
 export default router;

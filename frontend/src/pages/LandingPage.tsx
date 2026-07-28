@@ -37,9 +37,8 @@ export default function LandingPage() {
   };
 
   const handleGitHubLogin = () => {
-    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || 'client-id-placeholder';
-    const redirectUri = import.meta.env.VITE_GITHUB_REDIRECT_URI || 'http://localhost:5173/login';
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo,read:user`;
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+    window.location.href = `${apiBase}/auth/github`;
   };
 
   return (

@@ -139,6 +139,34 @@ export class DashboardController {
     }
   };
 
+  /**
+   * GET /repositories/:id/developers
+   * Retrieves developer graph nodes for ownership and contribution analysis.
+   */
+  getRepositoryDevelopers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const repositoryId = this.validateRepositoryId(req.params.id);
+      const data = await this.service.getRepositoryDevelopers(repositoryId);
+      ApiResponse.success(res, 'Repository developers retrieved successfully', data, HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * GET /repositories/:id/insights
+   * Retrieves comprehensive AI engineering insights for the repository.
+   */
+  getRepositoryInsights = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const repositoryId = this.validateRepositoryId(req.params.id);
+      const data = await this.service.getRepositoryInsights(repositoryId);
+      ApiResponse.success(res, 'Repository insights retrieved successfully', data, HTTP_STATUS.OK);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   // ============================================================================
   // Private Helper & Validation Layer (Transport Parameter Checks Only)
   // ============================================================================

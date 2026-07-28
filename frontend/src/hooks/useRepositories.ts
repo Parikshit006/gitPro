@@ -1,8 +1,15 @@
 /* ============================================================
    GitPro — Repository Query Hooks
-   
-   TanStack Query hooks for repository CRUD, sync with 
+
+   TanStack Query hooks for repository CRUD, sync with
    optimistic updates, and polling during SYNCING state.
+
+   Backend routes (repository.routes.ts):
+     GET  /api/v1/repositories          → list
+     POST /api/v1/repositories          → register (body: { url } or { cloneUrl })
+     GET  /api/v1/repositories/:id      → getById
+     POST /api/v1/repositories/:id/sync → sync
+     GET  /api/v1/repositories/:id/health → health
    ============================================================ */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -39,12 +46,13 @@ export function useRepository(id: string) {
   });
 }
 
-/* ── Create Repository ── */
+/* ── Create Repository ──
+   Accepts { url } or { cloneUrl } — controller handles both */
 
 export function useCreateRepository() {
   const queryClient = useQueryClient();
 
-  return useMutation<Repository, Error, { cloneUrl: string }>({
+  return useMutation<Repository, Error, { url: string } | { cloneUrl: string }>({
     mutationFn: (body) => api.post('/repositories', body) as Promise<Repository>,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: repoKeys.all });

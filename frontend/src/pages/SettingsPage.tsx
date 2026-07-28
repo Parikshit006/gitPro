@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { User, Shield, Key, Moon, Sun, Monitor, GitBranch, Check, RefreshCw, LogOut } from 'lucide-react';
+import { User as UserIcon, Shield, Key, Moon, Sun, Monitor, GitBranch, Check, RefreshCw, LogOut } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
+import { useAuth, useLogout } from '../hooks/useAuth';
 import './SettingsPage.css';
 
 export default function SettingsPage() {
@@ -10,9 +11,11 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'appearance' | 'api' | 'security'>('profile');
   const [apiKey, setApiKey] = useState('gp_live_89a7f6c5e4d3b2a10987654321');
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const { data: user } = useAuth();
+  const { mutate: logout } = useLogout();
 
   const handleLogout = () => {
-    window.location.href = '/login';
+    logout();
   };
 
   const handleRegenerateKey = () => {
@@ -43,7 +46,7 @@ export default function SettingsPage() {
         {/* Left Navigation Sidebar */}
         <div className="w-full md:w-64 flex flex-col gap-1 shrink-0">
           {[
-            { id: 'profile', label: 'Profile & GitHub', icon: User },
+            { id: 'profile', label: 'Profile & GitHub', icon: UserIcon },
             { id: 'appearance', label: 'Appearance & Theme', icon: Moon },
             { id: 'api', label: 'API Access Tokens', icon: Key },
             { id: 'security', label: 'Security & Sessions', icon: Shield },
@@ -78,12 +81,16 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-6 pt-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center font-display font-bold text-xl text-[var(--healthy)]">
-                      E
-                    </div>
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="Avatar" className="w-14 h-14 rounded-full border border-[var(--border)] object-cover" />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center font-display font-bold text-xl text-[var(--healthy)]">
+                        {user?.username ? user.username[0].toUpperCase() : 'E'}
+                      </div>
+                    )}
                     <div>
-                      <h3 className="font-display font-semibold text-lg text-[var(--text)]">engineer@company.com</h3>
-                      <span className="text-xs font-mono text-muted">Principal Engineering Role • Active Session</span>
+                      <h3 className="font-display font-semibold text-lg text-[var(--text)]">{user?.email || user?.username || 'engineer@company.com'}</h3>
+                      <span className="text-xs font-mono text-muted">{user?.displayName || user?.username || 'Principal Engineering Role'} • Active Session</span>
                     </div>
                   </div>
 

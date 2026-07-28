@@ -5,6 +5,17 @@
    Single source of truth for the entire UI application.
    ============================================================ */
 
+/* ── User ── */
+
+export interface User {
+  readonly id: string;
+  readonly githubId: string;
+  readonly username: string;
+  readonly displayName: string | null;
+  readonly email: string | null;
+  readonly avatarUrl: string | null;
+}
+
 /* ── Repository ── */
 
 export type RepositoryStatus = 'REGISTERED' | 'SYNCING' | 'READY' | 'FAILED';

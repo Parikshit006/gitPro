@@ -126,6 +126,47 @@ export class RepositoryService {
     return repository;
   }
 
+  /**
+   * Returns all registered repositories in the GitPro instance.
+   */
+  async listRepositories(): Promise<Repository[]> {
+    const { prisma } = await import('../../lib/prisma');
+    const records = await prisma.repository.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return records.map((r: any) => ({
+      id: r.id,
+      githubId: r.githubId.toString(),
+      owner: r.owner,
+      name: r.name,
+      fullName: r.fullName,
+      defaultBranch: r.defaultBranch,
+      visibility: r.visibility,
+      cloneUrl: r.cloneUrl,
+      sizeKb: r.sizeKb,
+      language: r.language,
+      description: r.description,
+      status: r.status,
+      registeredById: r.registeredById,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+      lastSyncedAt: r.lastSyncedAt,
+    }));
+  }
+
+  /**
+   * Returns a single repository by its internal UUID.
+   * Throws 404 if not found.
+   */
+  async getRepository(id: string): Promise<Repository> {
+    const repo = await this.repositoryRepository.findById(id);
+    if (!repo) {
+      throw new AppError(`Repository with id '${id}' not found`, HTTP_STATUS.NOT_FOUND, true);
+    }
+    return repo;
+  }
+
+
 
   /**
    * Validates the URL format and extracts owner and repository name.

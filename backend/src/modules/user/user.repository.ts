@@ -93,4 +93,27 @@ export class UserRepository {
       );
     }
   }
+
+  /**
+   * Finds a user by their internal UUID (used by /auth/me endpoint).
+   * Returns null if no user is found.
+   */
+  async findById(id: string): Promise<User | null> {
+    const persistedUser = await prisma.user.findUnique({ where: { id } });
+    if (!persistedUser) return null;
+    return {
+      id: persistedUser.id,
+      githubId: persistedUser.githubId.toString(),
+      username: persistedUser.username,
+      displayName: persistedUser.displayName,
+      email: persistedUser.email,
+      avatarUrl: persistedUser.avatarUrl,
+      profileUrl: persistedUser.profileUrl,
+      isActive: persistedUser.isActive,
+      provider: persistedUser.provider,
+      createdAt: persistedUser.createdAt,
+      updatedAt: persistedUser.updatedAt,
+      lastLoginAt: persistedUser.lastLoginAt,
+    };
+  }
 }
